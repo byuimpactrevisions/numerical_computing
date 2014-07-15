@@ -1,18 +1,23 @@
 \lab{Algorithms}{Givens rotations and Least squares}{Givens rotations and Least squares}
-\objective{Use orthogonal transformations to perform QR decomposition.}
+\objective{Learn how to use orthogonal transformations to perform QR decomposition.}
 \label{lab:givens}
 
-In a previous lab, we discussed how to form the QR decomposition of a matrix using a series of householder reflectors.
-The general approach was to apply a series of orthogonal transformations to a given matrix to transform it into upper triangular form.
-This same approach can be applied using rotations instead of reflections.
+In a previous lab, we discussed how to form the QR decomposition of a matrix using a series of householder reflections. The general approach suggested was to apply a series of orthogonal transformations to a given matrix in order to transform it into a matrix of upper triangular form. This same approach can be applied using rotations instead of reflections.
 
-The matrix $\begin{pmatrix}\ cos \theta & - \sin \theta \\ \sin \theta & \cos \theta \end{pmatrix}$ rotates a vector counterclockwise by $\theta$.
-Given a vector $x = \begin{pmatrix} a \\ b \end{pmatrix}$, we can rotate $x$ into the span of $e_1$ by choosing the correct $\theta$.
-This zeros out the entry containing $b$.
-We could do this by finding the angle between $\begin{pmatrix} a \\ b \end{pmatrix}$ and the axis containing $b$ then rotating the vector by the negative of that angle.
-In order to avoid computations involving $\sin$ and $\arcsin$ at each iteration we can just solve for $\sin \theta $ and $\cos \theta$ using the pythagorean theorem instead of explicitly computing $\theta$.
-Such an approach gives us the result that $\cos \theta = \frac{a}{\sqrt{a^2 + b^2}}$ and $\sin \theta = \frac{- b}{\sqrt{a^2 + b^2}}$.
-The transformed image of $\begin{pmatrix} a \\ b \end{pmatrix}$ is then $\begin{pmatrix} \sqrt{a^2 + b^2} \\ 0 \end{pmatrix}$.
+The matrix 
+
+\centerline{$\begin{pmatrix}\ cos \theta & - \sin \theta \\ \sin \theta & \cos \theta \end{pmatrix}$}
+
+rotates a vector counterclockwise by $\theta$.
+We can rotate a given vector $x = \begin{pmatrix} a \\ b \end{pmatrix}$ into the span of $e_1$ by choosing the correct $\theta$. This zeros out the entry containing $b$. 
+
+We could do this by finding the angle between the vector x
+%$\begin{pmatrix} a \\ b \end{pmatrix}$ 
+and the axis containing $b$ and then rotating the vector by the negative of that angle. However, we want to avoid computations involving $\sin$ and $\arcsin$ at each iteration.  To do so we can solve for $\sin \theta $ and $\cos \theta$ using the pythagorean theorem instead of explicitly computing $\theta$. Such an approach gives us the result that 
+
+\centerline{$\cos \theta = \frac{a}{\sqrt{a^2 + b^2}}$ and $\sin \theta = \frac{- b}{\sqrt{a^2 + b^2}}$.}
+
+The transformed image of the vector x is then $\begin{pmatrix} \sqrt{a^2 + b^2} \\ 0 \end{pmatrix}$.
 
 The application of such a rotation to any two rows of a matrix $A$ is an orthonormal transform.
 Such a transformation can be represented in matrix form, where $c = \cos \theta$ and $s = \sin \theta$, like this:
@@ -25,10 +30,10 @@ I & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & I
 \end{pmatrix}
 \end{equation*}
-In actual computation, we \emph{do not} actually form such a large matrix at each step.
-Instead we apply the transformation to the two rows we want to change and then leave the rest of the matrix unchanged.
+In actual computation, we \emph{do not} actually form such a large matrix at each step. Instead, we apply the transformation to the two rows we want to change and then leave the rest of the matrix unchanged.
 Proceeding in this manner we can zero out each entry of any matrix below its main diagonal, resulting in a QR factorization.
-For an example, consider some matrix $A$.
+
+For example, consider some matrix $A$.
 Let $G \left( i, j, k \right)$ denote the Givens rotation that will zero out $A \left[ j, k \right]$ by rotation with row $i$ of $A$.
 We can zero out the entries below the main diagonal of A as follows:
 
@@ -81,8 +86,7 @@ Let $A$ be the array passed to the function.
             \State Use $c$ and $s$ to construct the matrix $G$
             \State Get a slice of $R$ of the current row and the row above it that includes the columns from the current column onward.
                 Multiply it in place by $G$ to zero out the leading nonzero entry of the current row.
-            \State Get a slice of $Q$ of the current row and the row above it and apply $G$ to it as well.
-                (Strictly speaking, you do not need to operate over these entire rows, but the slicing needed to avoid the extra computation is a little more involved, so we will not include that here.)
+            \State Get a slice of the current row of $Q$ and the row above it and apply $G$ to it. (Strictly speaking, you do not need to operate over these entire rows, but the slicing needed to avoid the extra computation is a little more involved, so we will not include that here.)
         \EndIf
     \EndFor
 \EndFor
@@ -118,7 +122,7 @@ Let $A$ be the array passed to the function.
       \item Get a slice of $R$ of the current row and the row above it that includes the columns from the current column onward.
       Multiply it in place by $G$ to zero out the leading nonzero entry of the current row.
 
-      \item Get a slice of $Q$ of the current row and the row above it and apply $G$ to it as well. (Strictly speaking, you do not need to operate over these entire rows, but the slicing needed to avoid the extra computation is a little more involved, so we will not include that here.)
+      \item Get a slice of the current row of $Q$ and the row above it and apply $G$ to it. (Strictly speaking, you do not need to operate over these entire rows, but the slicing needed to avoid the extra computation is a little more involved, so we will not include that here.)
 
       \end{itemize}
 
@@ -132,10 +136,10 @@ Let $A$ be the array passed to the function.
 
 This version of the algorithm is not the most well-optimized way to use Givens rotations, but it is good for illustrative purposes.
 
-Because Givens rotations only operate on two specific rows at a time, they give us a variety of ways to iterate over an array we are processing.
+Because Givens rotations only operate on two specific rows at a time, they provide multiple ways to iterate over the array we are processing.
 For example, using Givens rotations you could, starting at the bottom of each column and continuing up until you reach the main diagonal, zero out each entry by applying a Givens rotation to each row and the row immediately above it.
 Alternatively, within each column, you could could zero out the first entry of each row below the main diagonal by rotating it with the row corresponding to the main diagonal.
-Yet another way to do it would be to start at the bottom left corner of the matrix and then zero out each entry from left to right along each diagonal.
+Yet, another way to do it would be to start at the bottom left corner of the matrix and then zero out each entry from left to right along each diagonal.
 This flexibility is what makes the use of Givens rotations ideal for some problems.
 When working with sparse matrices, Givens rotations allow for the solution of linear systems through a series of orthonormal operations that operate only on small parts of the array.
 The fact that Givens rotations operate only on small portions of the array also lends well to parallel solutions to systems of equations (or least squares problems).
