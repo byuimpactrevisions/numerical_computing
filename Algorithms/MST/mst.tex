@@ -1,10 +1,7 @@
-%TODOS FOR THIS LAB
-%1.  Maybe merge mst and ImgSegMST
-
 \lab{Algorithm}{Kruskal's and Prim's Algorithm}{Kruskal's and Prim's Algorithm}
 \label{Ch:Kruskal}
 
-\objective{Find a minimum spanning tree for a connected, weighted graph using Kruskal's Algorithm and Prim's Algorithm.}
+\objective{Find a minimum spanning tree for a connected, weighted graph using Kruskal's Algorithm and Prim's Algorithm. Apply these techniques to segment an image.}
 
 \section*{Weighted Graphs and Spanning trees}
 
@@ -16,17 +13,17 @@ Remember that a graph is composed of two sets: a set of nodes and a set of edges
 \label{mst:graph1}
 \end{figure}
 
-A graph is directed if connections are uni-directional.
-A graph is undirected if connections are bi-directional.
-Figure 7.1 shows an example of an undirected graph.
-A weighted graph is a graph where each edge has a value associated with it.
+A graph is \emph{undirected} if its edges are bi-directional. This means that the edges have no specific direction in between nodes. Figure
+\ref{mst:graph1} shows an example of an undirected graph.
+A \emph{weighted graph} is a graph where each edge has a value associated with it.
 Usually these values represent some sort of cost or distance.
-A connected graph is a graph where there is a path, or a set of edges, that connects every two nodes together.
-We can write a matrix that describes this type of graph.
-Each row of our matrix represents a starting point and each column represents a destination.
-If an edge from one node to another exists, we put the weight of the edge.
+A \emph{connected graph} is a graph where there is a path, or a set of edges, that connects every two nodes together.
+
+We can represent a connected graph by a matrix.
+Each row of the matrix represents a starting point and each column represents a destination.
+If an edge from node \emph{i} to node \emph{j} exists, we put the weight of the edge in the \emph{i},\emph{j} entry of the matrix.
 If there is no edge, we put a 0.
-For the above graph in Figure 7.1 we generate the following matrix:
+For the above graph in Figure \ref{mst:graph1} we generate the following matrix:
 
 \[
 A = \begin{pmatrix}
@@ -39,9 +36,17 @@ A = \begin{pmatrix}
 \end{pmatrix}
 \]
 
-This matrix is called an adjacency matrix.
-Note that since the graph is undirected, then this matrix is symmetric.
-Now consider the graph in Figure 7.4.  This graph is the same as the graph in Figure 7.1, except now there is a weight attached to each edge.  The matrix for this graph is
+This matrix is called an \emph{adjacency matrix}.
+Note that the graph is undirected in this example and therefore the adjacency matrix is symmetric.
+
+Now consider the graph in Figure \ref{mst:graph4}.  This graph is similar to the graph in Figure \ref{mst:graph1}, except now weights are attached to each edge.  
+\begin{figure}[H]
+\includegraphics[width = .4\textwidth]{graph4.pdf}
+\caption{A weighted, undirected graph}
+\label{mst:graph4}
+\end{figure}
+
+The adjacency matrix for this graph is 
 \[
 A = \begin{pmatrix}
 0 & 3 & 0 & 0 & 0 & 6\\
@@ -54,9 +59,9 @@ A = \begin{pmatrix}
 \]
 
 Another way to store the information from a graph is to make a list of the edges with their corresponding weights.
-For an unweighted, undirected graph, this would just mean making a list of the pairs of nodes that correspond to each edge.
-For a weighted, undirected graph, a third value could be added to the end of each edge representing the corresponding weight of that edge.
-A list like this for the graph in Figure 7.1 would look like this:
+To do this for an unweighted, undirected graph, we simply create a list of the pairs of nodes that correspond to each edge.
+For a weighted, undirected graph, a third value could be added to each pair of nodes to represent the corresponding weight of the edge.
+A list like this for the graph in Figure \ref{mst:graph1} would look like this:
 
 \begin{align*}
 [('A', 'B'),
@@ -69,11 +74,8 @@ A list like this for the graph in Figure 7.1 would look like this:
  ('E', 'F')]
 \end{align*}
 
-For this lab, we will be focusing on undirected, weighted graphs.
-
-A spanning tree of a connected, undirected graph $G$ is an undirected graph that contains all the nodes of $G$, a subset of the edges, and no cycles.
-A cycle, for undirected graphs, is a path where you start and end on the same node without crossing any edge more than once.
-The red in Figure 7.2 is an example of a cycle in an undirected graph.
+A \emph{spanning tree} of a connected, undirected graph $G$ is an undirected graph that contains all the nodes of $G$, a subset of the edges, and no cycles.
+A cycle, for undirected graphs, is a path that starts and ends on the same node without crossing any edge more than once. Figure \ref{mst:graph3} shows an example of an undirected graph with a cycle in it. The cycle includes the nodes A, B, C, and F.
 
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph3.pdf}
@@ -81,26 +83,21 @@ The red in Figure 7.2 is an example of a cycle in an undirected graph.
 \label{mst:graph3}
 \end{figure}
 
-The minimum spanning tree (MST) of a weighted, undirected graph is a spanning tree where the total weight is less than or equal to the total weight of every other spanning tree.
-Both Kruskal's and Prim's Algorithms are methods that find the minimum spanning tree of a weighted, undirected graph.
-Figure 7.3 shows a spanning tree of the graph shown in Figure 7.1.
-Figure 8.5 shows a minimum spanning tree of the graph shown in Figure 7.4.
+A minimum spanning tree (MST) of a weighted, undirected graph is a spanning tree where the total weight is less than or equal to the total weight of every other spanning tree.
+Both Kruskal's and Prim's Algorithms are methods that find a minimum spanning tree of a weighted, undirected graph.
+Figure \ref{mst:graph2} shows a spanning tree of the graph shown in Figure \ref{mst:graph1}.
+Figure 5.5 shows a minimum spanning tree of the graph shown in Figure \ref{mst:graph4}.
 
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph2.pdf}
-\caption{A spanning tree with no cycles for the graph in Figure 7.1.}
+\caption{A spanning tree for the graph in Figure \ref{mst:graph1}.}
 \label{mst:graph2}
 \end{figure}
 
 \begin{figure}[H]
-\includegraphics[width = .4\textwidth]{graph4.pdf}
-\caption{A weighted, undirected graph}
-\label{mst:graph4}
-\end{figure}
-
-\begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph5.pdf}
-\caption{The MST of the graph in Figure 7.4.}
+\caption{A MST of the graph in Figure \ref{mst:graph4}.}
+\label{mst:graph5}
 \end{figure}
 
 \section*{Kruskal's algorithm}
@@ -110,40 +107,63 @@ Then starting with the smallest, the algorithm adds edges to the tree as long as
 When $n-1$ edges have been added, the algorithm stops.
 
 In order to avoid creating cycles while building the tree, it is necessary to keep track of which portions of the tree currently lie in connected groups.
-This can be done by creating a dictionary where, when the algorithm starts, each node points to itself as the "root" of its own tree.
-As you add edges to the tree you will change which nodes are the "root" nodes. This tracks which nodes are currently connected.
+This can be done by creating a dictionary where, when the algorithm starts, each node points to itself as the ``root" of its own tree.
+As we add edges to the tree we will change which nodes are the ``root" nodes. This tracks which nodes are currently connected.
 Doing this allows us to run the algorithm by iterating over the edges by weight in ascending order, and adding them to the tree if they connect nodes which are not already connected by the current tree.
 
-Consider the graph in Figure 7.4 and apply Kruskal's algorithm.
-First, we initialize our tree to be an empty list: \li{[]}.
-To track the root nodes of each tree, we will also initialize a dictionary where each node points to itself.
-It will look like this: \li{\{A:A, B:B, C:C, D:D, E:E, F:F\}}.
+We will consider the graph in Figure \ref{mst:graph4} and apply Kruskal's algorithm.
+First, we initialize our spanning tree to be an empty list. Then, to track the root nodes of each tree, we initialize a dictionary where each node points to itself.
+
+\begin{lstlisting}
+spanning_tree = []
+nodes = {'A': 'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F'}
+\end{lstlisting}
 Since there are 6 nodes in the graph, we will continue until we have 5 edges in the tree.
 Next, sort the edges by weight.
-The result is something like the list \li{[(C, D, 1), (C, E, 1), (D, E, 2), (A, B, 3), (B, F, 4), (E, F, 4), (B, C, 5), (C, F, 5), (A, F, 6)]}.
+
+\begin{lstlisting}
+edges = [(C, D, 1), (C, E, 1), (D, E, 2), (A, B, 3), (B, F, 4), (E, F, 4), 
+         (B, C, 5), (C, F, 5), (A, F, 6)]
+\end{lstlisting}
 
 Now we begin iterating through the edges to build the tree.
 The first edge in the list is \li{(C,D,1)}.
 The root for \li{C} is \li{C} and the root for \li{D} is \li{D}, so we add this edge to the tree.
 The tree becomes \li{[(C, D, 1)]}.
 We then change the root node of \li{D} to be \li{C}.
-The dictionary of root nodes now looks like \li{\{A:A, B:B, C:C, D:C, E:E, F:F\}}.
+The dictionary of root nodes now looks like
+
+\begin{lstlisting}
+{'A': 'A', 'B':'B', 'C':'C', 'D':'C', 'E':'E', 'F':'F'}
+\end{lstlisting}
 
 Now we process the next edge, \li{(C, E, 1)}.
 The root node of \li{C} is \li{C}, and the root node of \li{E} is \li{E}, so adding this edge does not create a cycle.
 We add this edge into the tree, so the tree is now \li{[(C, D, 1), (C, E, 1)]}.
-Then we change the root of \li{E} so that it is \li{C}, so the dictionary is \li{\{A:A, B:B, C:C, D:C, E:C, F:F\}}.
+Then we change the root of \li{E} so that it is \li{C}, so the dictionary is
+
+\begin{lstlisting}
+{'A': 'A', 'B':'B', 'C':'C', 'D':'C', 'E':'C', 'F':'F'}
+\end{lstlisting}
 
 The next edge is \li{(D, E, 2)}.
 The root node of the tree containing \li{D} is \li{C} and the root node of the tree containing \li{E} is \li{C}, so these nodes are already connected, so we do not add this edge to the tree.
 
 The next edge is \li{(A, B, 3)}.
 The root node for \li{A} is \li{A}, and the root node for \li{B} is \li{B}, so we add the edge to the tree and update the dictionary.
-The dictionary becomes \li{\{A:A, B:A, C:C, D:C, E:C, F:F\}}
+The dictionary becomes
+
+\begin{lstlisting}
+{'A': 'A', 'B':'A', 'C':'C', 'D':'C', 'E':'C', 'F':'F'}
+\end{lstlisting}
 
 The next edge is \li{(B, F, 4)}.
 The root node for \li{B} is \li{A} and the root node for \li{F} is \li{F}, so we add the edge to the tree and change the root node of \li{F} to be \li{A}.
-The dictionary becomes \li{\{A:A, B:A, C:C, D:C, E:C, F:A\}}
+The dictionary becomes
+
+\begin{lstlisting}
+{'A': 'A', 'B':'A', 'C':'C', 'D':'C', 'E':'C', 'F':'A'}
+\end{lstlisting}
 
 The next edge is \li{(E, F, 4)}.
 The root node for \li{E} is \li{C} and the root node for \li{F} is \li{A}.
