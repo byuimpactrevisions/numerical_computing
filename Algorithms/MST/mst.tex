@@ -102,23 +102,23 @@ Figure 5.5 shows a minimum spanning tree of the graph shown in Figure \ref{mst:g
 
 \section*{Kruskal's algorithm}
 
-Given a weighted, directed graph G with $n$ nodes, Kruskal's algorithm finds a minimum spanning tree by first sorting the edges from smallest to largest.
+Given a weighted, directed graph G with $n$ nodes, Kruskal's algorithm finds a minimum spanning tree by first sorting the edges by weight from smallest to largest.
 Then starting with the smallest, the algorithm adds edges to the tree as long as the addition of each new edge does not create a cycle.
 When $n-1$ edges have been added, the algorithm stops.
 
-In order to avoid creating cycles while building the tree, it is necessary to keep track of which portions of the tree currently lie in connected groups.
+In order to avoid creating cycles while building the spanning tree, it is necessary to keep track of which portions of the tree currently lie in connected groups.
 This can be done by creating a dictionary where, when the algorithm starts, each node points to itself as the ``root" of its own tree.
-As we add edges to the tree we will change which nodes are the ``root" nodes. This tracks which nodes are currently connected.
-Doing this allows us to run the algorithm by iterating over the edges by weight in ascending order, and adding them to the tree if they connect nodes which are not already connected by the current tree.
+As we add edges to the spanning tree we will change which nodes are the ``root" nodes. This tracks which nodes are currently connected.
+Doing this allows us to add edges to the spanning tree if they connect nodes which are not already connected by the current spanning tree.
 
 We will consider the graph in Figure \ref{mst:graph4} and apply Kruskal's algorithm.
-First, we initialize our spanning tree to be an empty list. Then, to track the root nodes of each tree, we initialize a dictionary where each node points to itself.
+First, we initialize our spanning tree to be an empty list. Then, to track the root nodes of each connected tree, we initialize a dictionary where each node points to itself.
 
 \begin{lstlisting}
 spanning_tree = []
 nodes = {'A': 'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F'}
 \end{lstlisting}
-Since there are 6 nodes in the graph, we will continue until we have 5 edges in the tree.
+Since there are six nodes in the graph, we will continue until we have five edges in the spanning tree.
 Next, sort the edges by weight.
 
 \begin{lstlisting}
@@ -126,10 +126,13 @@ edges = [(C, D, 1), (C, E, 1), (D, E, 2), (A, B, 3), (B, F, 4), (E, F, 4),
          (B, C, 5), (C, F, 5), (A, F, 6)]
 \end{lstlisting}
 
-Now we begin iterating through the edges to build the tree.
+Now we begin iterating through the edges to build the spanning tree.
 The first edge in the list is \li{(C,D,1)}.
 The root for \li{C} is \li{C} and the root for \li{D} is \li{D}, so we add this edge to the tree.
-The tree becomes \li{[(C, D, 1)]}.
+The tree becomes
+\begin{lstlisting}
+[('C', 'D', 1)]
+\end{lstlisting}
 We then change the root node of \li{D} to be \li{C}.
 The dictionary of root nodes now looks like
 
@@ -139,15 +142,19 @@ The dictionary of root nodes now looks like
 
 Now we process the next edge, \li{(C, E, 1)}.
 The root node of \li{C} is \li{C}, and the root node of \li{E} is \li{E}, so adding this edge does not create a cycle.
-We add this edge into the tree, so the tree is now \li{[(C, D, 1), (C, E, 1)]}.
-Then we change the root of \li{E} so that it is \li{C}, so the dictionary is
+We add this edge into the tree, so the tree is now
+
+\begin{lstlisting}
+[('C', 'D', 1), ('C', 'E', 1)]
+\end{lstlisting}
+Then we change the root of \li{E} so that it is \li{C}. The dictionary is now
 
 \begin{lstlisting}
 {'A': 'A', 'B':'B', 'C':'C', 'D':'C', 'E':'C', 'F':'F'}
 \end{lstlisting}
 
 The next edge is \li{(D, E, 2)}.
-The root node of the tree containing \li{D} is \li{C} and the root node of the tree containing \li{E} is \li{C}, so these nodes are already connected, so we do not add this edge to the tree.
+The root node of the tree containing \li{D} is \li{C} and the root node of the tree containing \li{E} is \li{C}, so these nodes are already connected, so we do not add this edge to the spanning tree.
 
 The next edge is \li{(A, B, 3)}.
 The root node for \li{A} is \li{A}, and the root node for \li{B} is \li{B}, so we add the edge to the tree and update the dictionary.
@@ -156,28 +163,45 @@ The dictionary becomes
 \begin{lstlisting}
 {'A': 'A', 'B':'A', 'C':'C', 'D':'C', 'E':'C', 'F':'F'}
 \end{lstlisting}
+The tree becomes
+\begin{lstlisting}
+[('C', 'D', 1), ('C', 'E', 1), ('A', 'B', 3)]
+\end{lstlisting}
 
 The next edge is \li{(B, F, 4)}.
 The root node for \li{B} is \li{A} and the root node for \li{F} is \li{F}, so we add the edge to the tree and change the root node of \li{F} to be \li{A}.
+
 The dictionary becomes
 
 \begin{lstlisting}
 {'A': 'A', 'B':'A', 'C':'C', 'D':'C', 'E':'C', 'F':'A'}
 \end{lstlisting}
-
+The tree becomes
+\begin{lstlisting}
+[('C', 'D', 1), ('C', 'E', 1), ('A', 'B', 3), ('B', 'F', 4)]
+\end{lstlisting}
 The next edge is \li{(E, F, 4)}.
 The root node for \li{E} is \li{C} and the root node for \li{F} is \li{A}.
-We add the edge to the tree and end the algorithm since there are now 5 edges in the tree.
-(If we were to continue the algorithm, we would update the root node of \li{A} to be \li{C}.)
+We add the edge to the tree and end the algorithm since the spanning tree now has five edges.
 
-Notice how we updated the root of the root node to one of the nodes in the edge added.
-We manage the root nodes in this manner in order to find the root node by tracing back through the dictionary until we find a node that points to itself.
+The final spanning tree looks like
+\begin{lstlisting}
+[('C', 'D', 1), ('C', 'E', 1), ('A', 'B', 3), ('B', 'F', 4), ('E', 'F', 4)]
+\end{lstlisting}
+If we were to continue the algorithm, we would update the root node of \li{A} to be \li{C}. The dictionary would then look like
+
+\begin{lstlisting}
+{'A': 'C', 'C': 'C', 'B': 'A', 'E': 'C', 'D': 'C', 'F': 'A'}
+\end{lstlisting}
+
+
+One of the keys to this algorithm is to make sure we are not adding cycles into the spanning tree. A way to think about how the algorithm does this is by picturing it building smaller trees that have a common root node, and then as the algorithm progresses, all of these smaller trees join to have the same root node. To find the root node of the tree, we look through our dictionary until we find a node that points to itself.
 For example, to find the root node of \li{F} we first need to get the value for \li{F} from the dictionary.  This is \li{A}.
 Then we get the value for \li{A} from the dictionary which is \li{C}.
-Since the value of \li{C} in the dictionary is itself, the \li{C} is the root node of the graph containing \li{F}.
+Since the value of \li{C} in the dictionary is itself, then \li{C} is the root node of the graph containing \li{F}.
 It is necessary to trace through the dictionary in this manner each time because we avoid iterating over all of the nodes and updating their root values everytime.
 
-Below is the pseudocode for the algorithm as we have described it above:
+Below is the outline of the algorithm we have described above:
 
 \begin{itemize}
 
