@@ -1,5 +1,6 @@
 \lab{Python}{The Standard Library}{Standard Library}
 \objective{Become familiar with the Python standard library}
+\label{lab:Standard Library}
 
 Python has a very rich set of tools available by default.
 There are about 80 built-in functions that are always present in any Python environment.
@@ -491,6 +492,7 @@ Standard tuples in Python are accessed by index while named tuples allow access 
 18
 \end{lstlisting}
 
+\label{deques}
 A double-ended queue, or deque (pronounced ``deck''), can be thought of as a deck of cards.
 Inserting and removing elements from either end is highly efficient.
 Python's deque implementation only allows insertions at the left and right ends of the data structure (which is standard for deques).
@@ -621,10 +623,6 @@ Write two functions that will rotate the elements of a deque (from the collectio
 To rotate the list, remove elements from the right end one by one and insert them on the left end one by one.
 Compare the timings you obtain from a deque and a list of 10000 elements, using the timer function defined in this section. Rotate all elements of the list and deque so that your final sequence is the same as when you started.
 \end{problem}
-
-
-
-
 
 \begin{problem}
 Throughout this lab we have worked on simulating the Hunger Games tournament using the standard library and other built-in functions found in Python.
