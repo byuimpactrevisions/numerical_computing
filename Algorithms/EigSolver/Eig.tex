@@ -10,8 +10,8 @@ A x &= \lambda x \notag \\
 A x - \lambda x &= 0 \notag \\
 (A - \lambda I)x  &= 0 \label{eq:singularity}
 \end{align}
-Since $x$ is nonzero, \eqref{eq:singularity} means $A-\lambda I$ must be singular.
-Thus $\det(A - \lambda I) = 0$.  This determinant is often notated $\det(A - \lambda I) = p(\lambda)$ and is called the \emph{characteristic polynomial} of $A$.
+Since $x$ is nonzero, \eqref{eq:singularity} indicates $A-\lambda I$ must be singular.
+Thus, $\det(A - \lambda I) = 0$.  This determinant is often notated $\det(A - \lambda I) = p(\lambda)$ and is called the \emph{characteristic polynomial} of $A$.
 The roots of the characteristic polynomial are the eigenvalues of $A$.
 
 If $A$ is $n \times n$, the degree of $p(\lambda)$ is  $n$.
@@ -24,10 +24,10 @@ Abel's Theorem  outlines the problem.
 \end{theorem}
 
 Therefore, there is no method that will exactly find the eigenvalues of an arbitrary matrix.
-This is a significant result. In practice it means that we often rely on iterative methods, which converge to the eigenvalues.
+This is a significant result. In practice, it means that we often rely on iterative methods, which converge to the eigenvalues.
 
 \section*{The Power Method}
-There are many such iterative methods for finding eigenvalues. The Power Method is a simple fast way to find the largest eigenvalue and eigenvector. You begin with a vector $x_0$, that has norm 1, and do the iteration.
+There are many such iterative methods for finding eigenvalues. The Power Method is a simple, fast way to find the largest eigenvalue and eigenvector. Beginning with a vector $x_0$ that has norm 1, the following iteration is applied:
 \[
 x_{k+1}=\frac{Ax_k}{\norm{Ax_k}}
 \]
@@ -38,8 +38,8 @@ it works when
 
 \end{itemize}
 
-This often converges slowly (geometric with the ration given by $\norm{\lambda_2/\lambda_1}$ but is especially useful when your matrix has all positive values because you are guaranteed to have a dominant eigenvalue and the modulus of dominant eigenvalue is often much greater than the rest of the eigenvalues so the convergence is much faster.
-Whenever you have an eigenvector you can compute its corresponding eigenvalue using the Rayleigh quotient
+This often converges slowly (geometric with the ration given by $\norm{\lambda_2/\lambda_1}$, but is especially useful when your matrix has all positive values because you are guaranteed to have a dominant eigenvalue. Note that the modulus of the dominant eigenvalue is often much greater than the rest of the eigenvalues so the convergence is much faster.
+Given an eigenvector, its corresponding eigenvalue can be computed using the Rayleigh quotient:
 \[
 \lambda = \frac{Ax\cdot x}{x\cdot x}
 \]
