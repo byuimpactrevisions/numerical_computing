@@ -434,8 +434,9 @@ Create a function which prints your comparison.
 
 %Lab \ref{MSTImgSeg}
 
-One application of MSTs is image segmentation. Image segmentation is the process that takes an image and seperates it into similar parts.
-Kruskal's algorithm is especially good at this. To use Kruskal's we first convert the image we want to segment into a graph. We consider each pixel to be a node and define weights between the nodes. You then build the minimum spanning tree. If you take away the edge with the greatest weight you will get two forests (removing an edge from any graph with no cycles will create two forests). Then you can continue doing this to each forest to split up those forests. Each forest corresponds to a segment of the image.
+One application of MSTs is image segmentation. Image segmentation is the process that takes an image and seperates it into similar parts. This process has many applications. For example, when analyzing a satellite image, it might be useful to distinguish between the different parts of the image to aid in object recognition.
+
+Kruskal's algorithm is especially good at segmenting images. To use Kruskal's we first convert the image we want to segment into a graph. We consider each pixel to be a node and define weights between the nodes. You then build the minimum spanning tree. If you take away the edge with the greatest weight you will get two forests (removing an edge from any graph with no cycles will create two forests). Then you can continue doing this to each forest to split up those forests. Each forest corresponds to a segment of the image.
 Let $k$ be the number of divisions that is wanted and $n$ be the number of nodes.
 Kruskal's algorithm is performed until $n-(k+1)$ edges are added which is the same as taking out the $k$ edges with greatest weights.
 
