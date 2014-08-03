@@ -436,22 +436,44 @@ Create a function which prints your comparison.
 
 One application of MSTs is image segmentation. Image segmentation is the process that takes an image and seperates it into similar parts. This process has many applications. For example, when analyzing a satellite image, it might be useful to distinguish between the different parts of the image to aid in object recognition.
 
-Kruskal's algorithm is especially good at segmenting images. To use Kruskal's we first convert the image we want to segment into a graph. We consider each pixel to be a node and define weights between the nodes. You then build the minimum spanning tree. If you take away the edge with the greatest weight you will get two forests (removing an edge from any graph with no cycles will create two forests). Then you can continue doing this to each forest to split up those forests. Each forest corresponds to a segment of the image.
-Let $k$ be the number of divisions that is wanted and $n$ be the number of nodes.
-Kruskal's algorithm is performed until $n-(k+1)$ edges are added which is the same as taking out the $k$ edges with greatest weights.
+Kruskal's algorithm is especially good at segmenting images. To use Kruskal's, we first need to convert the image we want to segment into a graph. We do this by considering each pixel to be a node. To find the weights between each node, we take the absolute value of the difference between the values of the pixels. For example, consider an image represented by the following matrix:
 
-There are many different ways to turn an image into a graph and weight the edges.
-A simple, yet effective, version is to make every pixel a node and the edges are the difference in intensities in the four cardinal directions.
+\[
+\begin{pmatrix}
+37 & 44 & 40 & 39 \\
+50 & 51 & 45 & 45 \\
+55 & 45 & 45 & 54 \\
+61 & 59 & 54 & 52 \\
+\end{pmatrix}
+\]
 
-
-This means that there are less than $4n$ edges.
-Other image segmentation algorithms have to use $n^2$ space.
+We first look at the nodes 0 and 1, corresponding to the pixel values 37 and 44. Our first edge would then be \li{(0, 1, 7)}, where 7 is the absolute value of the difference between 37 and 44. We then continue on the first row, finding the weights between nodes. Once we reach the second row we will be on node 4. The edge between nodes 4 and 5 will then be the edge between pixel values 50 and 51 and will therefore have a corresponding weight of 1. We continue in this manner, until we convert every pixel into a node and find the weight between nodes, or in this case, the difference in pixel values. 
+	
+There are many different ways to turn an image into a graph and weight the edges. This version guarantees however, that there will be less than $4n$ edges, where $n$ is the number of nodes. Other image segmentation algorithms have to use $n^2$ space.
 This gives the MST algorithm a critical advantage over other image segmentation algorithms.
 
 \begin{problem}
-Write a function that takes a black and white image as input and outputs a list of the edges and a list of nodes.
-Store the edges using the form \li{(node,node,weight)}.
+Write a function that takes a black and white image as input and outputs a list of the edges and corresponding weights. Store the edges using the form \li{(node,node,weight)}.
+
+Apply your function to the image saved as MSTseg1.jpg. This image is read in as a three-dimensional array, but we want a two-dimensional array in order to convert the image into a graph. To fix this we average over the third axis to reduce the dimensions.
+\begin{lstlisting}
+from matplotlib import pyplot as plt
+img = plt.imread('MSTseg1.jpg')
+img2 = img.mean(axis=2)
+\end{lstlisting}
+
+\begin{figure}[H]
+\includegraphics[width = .4\textwidth]{MSTseg1.jpg}
+\caption{MSTseg1.jpg}
+\end{figure}
+
 \end{problem}
+
+
+You then build the minimum spanning tree. If you take away the edge with the greatest weight you will get two forests (removing an edge from any graph with no cycles will create two forests). Then you can continue doing this to each forest to split up those forests. Each forest corresponds to a segment of the image.
+Let $k$ be the number of divisions that is wanted and $n$ be the number of nodes.
+Kruskal's algorithm is performed until $n-(k+1)$ edges are added which is the same as taking out the $k$ edges with greatest weights.
+
 
 The provided Kruskal's algorithm takes as inputs the list of nodes, the list of edges and the number of divisions desired.
 The number of divisions often has to be higher than the actual number that is needed because sometimes one or two pixels form a division because the difference between them and the pixels around them is so great.
