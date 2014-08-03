@@ -26,7 +26,7 @@ One way to encode the information found in a graph is to use what is called an a
 
 Every undirected edge can be represented as two directed edges.
 Figure \ref{fig:example_graph} shows a simple undirected graph.
-The graph in Figure \ref{fig:example_graph} can be represented as the following adjacency matrix.
+The graph in Figure \ref{fig:example_graph} can be represented by the following adjacency matrix.
 \[
 A = \begin{pmatrix}
 0 & 1 & 0 & 0 & 1 & 0\\
@@ -42,11 +42,12 @@ The diagonal represents self-edges, or edges that connect a node to itself.
 
 Raising the adjacency matrix to a power yields some very interesting information.
 We can discover the number of paths of length $n$ between two nodes by raising a graph's adjacency matrix to the $n$th power.
-For example, by squaring $A$, we can find the number of paths of length 2 between every pair of nodes.
+For example, by squaring $A$, we can find the number of paths of length two between every pair of nodes.
 \begin{lstlisting}
 >>> A = np.array([[0,1,0,0,1,0],[1,0,1,0,1,0],
                   [0,1,0,1,0,0],[0,0,1,0,1,1],
                   [1,1,0,1,0,0],[0,0,0,1,0,0]])
+
 >>> np.linalg.matrix_power(A,2)
 array([[2, 1, 1, 1, 1, 0],
        [1, 3, 0, 2, 1, 0],
@@ -55,8 +56,8 @@ array([[2, 1, 1, 1, 1, 0],
        [1, 1, 2, 0, 3, 1],
        [0, 0, 1, 0, 1, 1]])
 \end{lstlisting}
-We can see that no paths of length 2 exist between node 0 and node 5 because $A^2_{0,5} = 0$.
-By calculating $A^6$ we can find the number of paths length 6 from node 3 to itself.
+We can see that no paths of length two exist between node 0 and node 5 because $A^2_{0,5} = 0$.
+By calculating $A^6$ we can find the number of paths of length six from node 3 to itself.
 \begin{lstlisting}
 >>> np.linalg.matrix_power(A, 6)
 array([[45, 54, 38, 45, 54, 16],
@@ -66,10 +67,10 @@ array([[45, 54, 38, 45, 54, 16],
        [54, 51, 70, 31, 93, 34],
        [16, 11, 27,  4, 34, 14]])
 \end{lstlisting}
-We see that there are 55 unique paths of length 6 from node 3 to itself.
+We see that there are 75 unique paths of length six from node 3 to itself.
 Imagine trying to count all of those paths by hand!
 It would be very easy to count incorrectly.
-However, this method makes it very simple to count paths without any mistakes.
+This method makes it very simple to count paths without mistakes.
 
 Adjacency matrices can also be composed of \li{True} and \li{False} values.
 In this case, the $n$th power of such a matrix (using boolean arithmetic)
@@ -95,17 +96,19 @@ of length five?
 From which node to which node is there no path of length seven?
 \end{problem}
 
-Another useful way of representing an undirected graph is a Laplacian matrix.
-This special matrix can reveal a lot of information about a graph.
-\begin{definition}
-For a simple graph (an unweighted, undirected graph without self-edges), the Laplacian of a graph $G$ is
-\[ L_G = D_G - A_G \]
-where $D_G$ is the degree matrix of $G$ and $A_G$ is the adjacency matrix of $G$.
-\end{definition}
 An important question in working with graphs is the degree of its nodes.
 The degree of a node is the number of edges that connect to the node.
 For a directed graph, each node has an \emph{out-degree} (the number of edges directed away from a node) and an \emph{in-degree} (the number edges directed toward a node).
-The degree matrix of a graph is a diagonal matrix that has the degree of each node as the diagonal entries (thus, for a directed graph there in an in-degree matrix and an out-degree matrix).
+The degree matrix of a graph is a diagonal matrix that has the degree of each node as the diagonal entries (thus, for a directed graph there is an in-degree matrix and an out-degree matrix).
+
+Another useful way of representing an undirected graph is a Laplacian matrix.
+This special matrix can reveal a lot of information about a graph.
+\begin{definition}
+For a simple graph (an undirected graph without self-edges), the Laplacian of a graph $G$ is
+\[ L_G = D_G - A_G \]
+where $D_G$ is the degree matrix of $G$ and $A_G$ is the adjacency matrix of $G$.
+\end{definition}
+
 
 \begin{problem}
 Calculate the Laplacian matrix of the graph in Figure \ref{fig:example_graph} by calculating $D$ and $A$.
