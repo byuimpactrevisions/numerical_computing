@@ -1,0 +1,15 @@
+def plotSeg(segments,img):
+    s=img.shape[0]
+    d=Counter(segments)
+    segs=d.most_common(10)
+    parts=segments.reshape((s,s))
+    plt.subplot(221)
+    plt.imshow(img)
+    plt.subplot(222)
+    plt.imshow(img*(parts==segs[0][0]))
+    plt.subplot(223)
+    plt.imshow(img*(parts==segs[1][0]))
+    plt.subplot(224)
+    plt.imshow(img*(parts==segs[2][0]))
+    plt.gray()
+    plt.show()
