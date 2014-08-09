@@ -10,11 +10,11 @@ Remember that a graph is composed of two sets: a set of nodes and a set of edges
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph1.pdf}
 \caption{An example of an undirected graph}
-\label{mst:graph1}
+\label{fig:graph1}
 \end{figure}
 
 A graph is \emph{undirected} if its edges are bi-directional. This means that the edges have no specific direction in between nodes. Figure
-\ref{mst:graph1} shows an example of an undirected graph.
+\ref{fig:graph1} shows an example of an undirected graph.
 A \emph{weighted graph} is a graph where each edge has a value associated with it.
 Usually these values represent some sort of cost or distance.
 A \emph{connected graph} is a graph where there is a path, or a set of edges, that connects every two nodes together.
@@ -23,7 +23,7 @@ We can represent a connected graph by a matrix.
 Each row of the matrix represents a starting point and each column represents a destination.
 If an edge from node \emph{i} to node \emph{j} exists, we put the weight of the edge in the \emph{i},\emph{j} entry of the matrix.
 If there is no edge, we put a 0.
-For the above graph in Figure \ref{mst:graph1} we generate the following matrix:
+For the above graph in Figure \ref{fig:graph1} we generate the following matrix:
 
 \[
 A = \begin{pmatrix}
@@ -39,11 +39,11 @@ A = \begin{pmatrix}
 This matrix is called an \emph{adjacency matrix}.
 Note that the graph is undirected in this example and therefore the adjacency matrix is symmetric.
 
-Now consider the graph in Figure \ref{mst:graph4}.  This graph is similar to the graph in Figure \ref{mst:graph1}, except now weights are attached to each edge.  
+Now consider the graph in Figure \ref{fig:graph2}.  This graph is similar to the graph in Figure \ref{fig:graph1}, except now weights are attached to each edge.  
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph4.pdf}
 \caption{A weighted, undirected graph}
-\label{mst:graph4}
+\label{fig:graph2}
 \end{figure}
 
 The adjacency matrix for this graph is 
@@ -61,7 +61,7 @@ A = \begin{pmatrix}
 Another way to store the information from a graph is to make a list of the edges with their corresponding weights.
 To do this for an unweighted, undirected graph, we simply create a list of the pairs of nodes that correspond to each edge.
 For a weighted, undirected graph, a third value could be added to each pair of nodes to represent the corresponding weight of the edge.
-A list like this for the graph in Figure \ref{mst:graph1} would look like this:
+A list like this for the graph in Figure \ref{fig:graph1} would look like this:
 
 \begin{align*}
 [('A', 'B'),
@@ -75,29 +75,29 @@ A list like this for the graph in Figure \ref{mst:graph1} would look like this:
 \end{align*}
 
 A \emph{spanning tree} of a connected, undirected graph $G$ is an undirected graph that contains all the nodes of $G$, a subset of the edges, and no cycles.
-A cycle, for undirected graphs, is a path that starts and ends on the same node without crossing any edge more than once. Figure \ref{mst:graph3} shows an example of an undirected graph with a cycle in it. The cycle includes the nodes A, B, C, and F.
+A cycle, for undirected graphs, is a path that starts and ends on the same node without crossing any edge more than once. Figure \ref{fig:graph3} shows an example of an undirected graph with a cycle in it. The cycle includes the nodes A, B, C, and F.
 
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph3.pdf}
 \caption{A cycle in an undirected graph}
-\label{mst:graph3}
+\label{fig:graph3}
 \end{figure}
 
 A minimum spanning tree (MST) of a weighted, undirected graph is a spanning tree where the total weight is less than or equal to the total weight of every other spanning tree.
 Both Kruskal's and Prim's Algorithms are methods that find a minimum spanning tree of a weighted, undirected graph.
-Figure \ref{mst:graph2} shows a spanning tree of the graph shown in Figure \ref{mst:graph1}.
-Figure 5.5 shows a minimum spanning tree of the graph shown in Figure \ref{mst:graph4}.
+Figure \ref{fig:graph4} shows a spanning tree of the graph shown in Figure \ref{fig:graph1}.
+Figure \ref{fig:graph5} shows a minimum spanning tree of the graph shown in Figure \ref{fig:graph2}.
 
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph2.pdf}
-\caption{A spanning tree for the graph in Figure \ref{mst:graph1}.}
-\label{mst:graph2}
+\caption{A spanning tree for the graph in Figure \ref{fig:graph1}.}
+\label{fig:graph4}
 \end{figure}
 
 \begin{figure}[H]
 \includegraphics[width = .4\textwidth]{graph5.pdf}
-\caption{A MST of the graph in Figure \ref{mst:graph4}.}
-\label{mst:graph5}
+\caption{A MST of the graph in Figure \ref{fig:graph2}.}
+\label{fig:graph5}
 \end{figure}
 
 \section*{Kruskal's algorithm}
@@ -111,7 +111,7 @@ This can be done by creating a dictionary where, when the algorithm starts, each
 As we add edges to the spanning tree we will change which nodes are the ``root" nodes. This tracks which nodes are currently connected.
 Doing this allows us to add edges to the spanning tree if they connect nodes which are not already connected by the current spanning tree.
 
-We will consider the graph in Figure \ref{mst:graph4} and apply Kruskal's algorithm.
+We will consider the graph in Figure \ref{fig:graph2} and apply Kruskal's algorithm.
 First, we initialize our spanning tree to be an empty list. Then, to track the root nodes of each connected tree, we initialize a dictionary where each node points to itself.
 
 \begin{lstlisting}
@@ -289,7 +289,7 @@ def formChanger(oldData):
 Prim's is a similar algorithm for finding minimum spanning trees.
 While it is much slower than Kruskal's algorithm for sparse graphs, it is much faster for dense graphs because Prim's algorithm avoids sorting the edges.
 
-Again, consider the example shown in Figure \ref{mst:graph4} .
+Again, consider the example shown in Figure \ref{fig:graph2}.
 We first initialize a dictionary with all of the nodes as keys in order to track which nodes have not been processed.
 At the beginning it will look like:
 \begin{lstlisting}
@@ -436,7 +436,7 @@ Create a function which prints your comparison.
 
 One application of MSTs is image segmentation. Image segmentation is the process that takes an image and seperates it into similar parts. This process has many applications. For example, when analyzing a satellite image, it might be useful to distinguish between the different parts of the image to aid in object recognition.
 
-Kruskal's algorithm is especially good at segmenting images. To use Kruskal's, we first need to convert the image we want to segment into a graph. We do this by considering each pixel to be a node. To find the weights between each node, we take the absolute value of the difference between the values of the pixels. For example, consider an image represented by the following matrix:
+Kruskal's algorithm is especially good at segmenting images. To use Kruskal's, we first need to convert the image we want to segment into a graph. We do this by considering each pixel to be a node. To find the weights between each node, we take the absolute value of the difference between the values of the pixels. For example, consider an image represented by the following matrix, where each element is a pixel:
 
 \[
 \begin{pmatrix}
@@ -446,48 +446,41 @@ Kruskal's algorithm is especially good at segmenting images. To use Kruskal's, w
 61 & 59 & 54 & 52 \\
 \end{pmatrix}
 \]
-
-We first look at the nodes 0 and 1, corresponding to the pixel values 37 and 44. Our first edge would then be \li{(0, 1, 7)}, where 7 is the absolute value of the difference between 37 and 44. We then continue on the first row, finding the weights between nodes. Once we reach the second row we will be on node 4. The edge between nodes 4 and 5 will then be the edge between pixel values 50 and 51 and will therefore have a corresponding weight of 1. We continue in this manner, until we convert every pixel into a node and find the weight between nodes, or in this case, the difference in pixel values. 
+To number our nodes, we first assign node 0 to the pixel in the upper left corner of the matrix and move across the row until we have assigned each pixel a node, ending with node 3. We then start at the begninning of the second row and assign node 4 to the first pixel in that row and continue on in this manner until all of the pixels in the matrix have been assigned a node. To find the weights between each node we start by calculating the weight between nodes 0 and 1, corresponding to the pixel values 37 and 44. Our first edge would then be \li{(0, 1, 7)}, where 7 is the weight, or the absolute value of the difference between 37 and 44. We then find the weight between nodes 0 and 4, which we calculate to be 13. Our second edge therefore would be \li{(0, 4, 13)}. We continue on in this manner, until we have found all of our edges. 
 	
-There are many different ways to turn an image into a graph and weight the edges. This version guarantees however, that there will be less than $4n$ edges, where $n$ is the number of nodes. Other image segmentation algorithms have to use $n^2$ space.
+There are many different ways to turn an image into a graph and weight the edges. This version guarantees however, that there will be less than $4n$ edges, where $n$ is the number of nodes. Other image segmentation algorithms are forced to use $n^2$ space.
 This gives the MST algorithm a critical advantage over other image segmentation algorithms.
 
 \begin{problem}
-Write a function that takes a black and white image as input and outputs a list of the edges and corresponding weights. Store the edges using the form \li{(node,node,weight)}.
+Write a function that takes a black and white image as input and outputs a list of the edges and corresponding weights. Store the edges and weights using the form \li{(node,node,weight)}.
 
-Apply your function to the image saved as MSTseg1.jpg. This image is read in as a three-dimensional array, but we want a two-dimensional array in order to convert the image into a graph. To fix this we average over the third axis to reduce the dimensions.
+Apply your function to the image saved as `MSTseg1.jpg' (the top left image in Figure \ref{fig:graph6}). This image is read in as a three-dimensional array. Since we want a two-dimensional array in order to convert the image into a graph, we average over the third axis to reduce the dimensions.
+
 \begin{lstlisting}
 from matplotlib import pyplot as plt
 img = plt.imread('MSTseg1.jpg')
 img2 = img.mean(axis=2)
 \end{lstlisting}
-
-\begin{figure}[H]
-\includegraphics[width = .4\textwidth]{MSTseg1.jpg}
-\caption{MSTseg1.jpg}
-\end{figure}
-
+For this image, your function should return 495,012 edges.
+\label{problem4}
 \end{problem}
 
 
-You then build the minimum spanning tree. If you take away the edge with the greatest weight you will get two forests (removing an edge from any graph with no cycles will create two forests). Then you can continue doing this to each forest to split up those forests. Each forest corresponds to a segment of the image.
-Let $k$ be the number of divisions that is wanted and $n$ be the number of nodes.
-Kruskal's algorithm is performed until $n-(k+1)$ edges are added which is the same as taking out the $k$ edges with greatest weights.
+
+Once we have converted our image into a graph, we can build the minimum spanning tree. If we take away the edge with the greatest weight from the tree we will get two \emph{forests} (removing an edge from any graph with no cycles will create two forests). Each forest corresponds to a segment of the image. If we remove the edge with the greatest weight from each of those forests, we will create new forests.  
+
+We can use Kruskal's algorithm to find these forests. Let $k$ be the number of divisions that is wanted and $n$ be the number of nodes. We run Kruskal's algorithm until $n-(k+1)$ edges are added, which is the same as taking out the $k$ edges with greatest weights. So instead of building the whole minimum spanning tree and then removing the edges with greatest weights, we just apply Kruskal's algorithm up to a certain point and stop, giving us the forests or segments we want.
 
 
-The provided Kruskal's algorithm takes as inputs the list of nodes, the list of edges and the number of divisions desired.
-The number of divisions often has to be higher than the actual number that is needed because sometimes one or two pixels form a division because the difference between them and the pixels around them is so great.
-You will have to adjust the number of divisions until the desired result is found.  See Figure 5.6.
+Below is provided a modified version of the Kruskal's algorithm we did previously to find the minimum spanning tree of a graph. It takes as inputs the list of nodes and the list of edges from a graph, along with the number of divisions desired. The number of divisions often has to be set higher than the actual number that is needed because sometimes one or two pixels form a spurious division (the difference between them and the pixels around them is too great).
+You will have to adjust the number of divisions until the desired result is found.  See Figure \ref{fig:graph6}.
+
+\lstinputlisting[style=fromfile]{kruskalDiv.py}
 
 \begin{problem}
-Perform the image segmentation algorithm on the image, then graph the original image and the three largest divisions.
-(Use the Counter class from collections to find the number of pixels in each division.)
+Perform the image segmentation algorithm on the black and white image `MSTseg1.jpg'. Plot the image and the three largest segments using the plot function given below. This function takes in two inputs. The first is the values of the dictionary returned by the modified Kruskal's function given above. Make sure that you pass this in as a numpy array. The second input is the image array we are segmenting. 
+\lstinputlisting[style=fromfile]{plotSeg.py}
 \end{problem}
-
-\begin{problem}
-Make a division of the image a different color.
-\end{problem}
-
 
 \vfill
 \begin{figure}[ht]
@@ -510,6 +503,6 @@ Make a division of the image a different color.
 \includegraphics[width=\textwidth]{MSTseg4.jpg}
 \end{minipage}
 \caption{The original image is in the top left hand corner. The three larges segments are shown in the other corners. The original image was 498x498 and 50000 divisions were used.}
-\label{mst:graph6}
+\label{fig:graph6}
 \end{figure}
 \vfill 
