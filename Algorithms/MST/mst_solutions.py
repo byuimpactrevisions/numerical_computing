@@ -51,24 +51,24 @@ def kruskal(edges):
             nodes[remove] = root
 
 def prim(edges):
-	# Note: the comments here match the pseudocode in the lab.
+	# Note: the comments here match the outline in the lab.
 	# Please keep this in mind when making any changes.
 	#
     # Initialize a dictionary to track which nodes have been processed.
-    nodes = {node:True for node in {edge[0] for edge in edges} | {edge[1] for edge in edges}}
-    # Initialize an empty dictionary of lists to track the edges containing each node.
+    nodes = {node:False for node in {edge[0] for edge in edges} | {edge[1] for edge in edges}}
+    # Initialize an empty dictionary of lists.
     edgelist = {node:[] for node in nodes}
-    # Fill the edge list.
+    # Fill the lists in the above dictionary.
     for n1, n2, weight in edges:
-        # Add each edge to the list corresponding to both of its nodes.
+        # Add each edge to the lists corresponding to both of its nodes.
         edgelist[n1].append((n2,weight))
         edgelist[n2].append((n1,weight))
     # Get the first edge to add (It can be the shortest edge
     # from any given node, the shortest edge is a good pick).
     add = min(edges, key=itemgetter(2))
     # Mark the nodes in the first edge as processed.
-    nodes[add[0]] = False
-    nodes[add[1]] = False
+    nodes[add[0]] = True
+    nodes[add[1]] = True
     # Initialize the tree to be the list containing the first edge.
     tree = [add]
     # Initialize an empty dictionary that will be used
@@ -79,7 +79,7 @@ def prim(edges):
     # Define a helper function to insert an edge into
     # the dictionary  if that insertion is needed.
     def insert(outside, node, weight):
-        if nodes[node]:
+        if nodes[node] == False:
             # Get the value of the node that is reached by the edge.
             val = vals.get(node)
             # If that node isn't in the dictionary, set its
@@ -107,7 +107,7 @@ def prim(edges):
         # Add it to the tree.
         tree.append((inside, outside, weight))
         # Mark the node reached by the new edge as processed.
-        nodes[outside] = False
+        nodes[outside] = True
         # Use the helper function to insert the edges
         # reached by the newly processed node into
         # the dictionary of edges to be processed.
