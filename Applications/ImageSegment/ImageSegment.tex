@@ -10,7 +10,6 @@
 \label{fig:example_graph}
 \end{figure}
 
-
 Graphs are often used to represent relationships between objects.
 They are represented by a set of nodes (or vertices) and a set of edges, where each edge connects exactly two nodes.
 We denote the number of vertices in a graph by $|V|$, and the number of edges by $|E|$.
@@ -99,10 +98,10 @@ From which node to which node is there no path of length seven?
 An important question in working with graphs is the degree of its nodes.
 The degree of a node is the number of edges that connect to the node.
 For a directed graph, each node has an \emph{out-degree} (the number of edges directed away from a node) and an \emph{in-degree} (the number edges directed toward a node).
-The degree matrix of a graph is a diagonal matrix that has the degree of each node as the diagonal entries (thus, for a directed graph there is an in-degree matrix and an out-degree matrix).
+The \emph{degree matrix} of a graph is a diagonal matrix that has the degree of each node as the diagonal entries (thus, for a directed graph there is an in-degree matrix and an out-degree matrix).
 
-Another useful way of representing an undirected graph is a Laplacian matrix.
-This special matrix can reveal a lot of information about a graph.
+Another useful way of representing an undirected graph is a \emph{Laplacian matrix}.
+This special matrix can reveal a lot of information about a graph, which we will see later in this lab.
 \begin{definition}
 For a simple graph (an undirected graph without self-edges), the Laplacian of a graph $G$ is
 \[ L_G = D_G - A_G \]
@@ -111,23 +110,31 @@ where $D_G$ is the degree matrix of $G$ and $A_G$ is the adjacency matrix of $G$
 
 
 \begin{problem}
-Calculate the Laplacian matrix of the graph in Figure \ref{fig:example_graph} by calculating $D$ and $A$.
-Think about how to find the number of neighboring nodes using an adjacency matrix.
+Write a function that accepts the adjacency matrix of a graph as an argument. Use the adjacency matrix to check that the graph is undirected and has no self-edges. Then using the definition above, calcluate the Laplacian matrix.
 
-Write a general solution that will calculate the Laplacian of any small graph.
-Use the adjacency matrix to check that the graph is unweighted, undirected, and contains no self-edges.
+Test your function by finding the Laplacian matrix of the graph in Figure \ref{fig:example_graph}. Your function should return the following Laplacian matrix:
+\[
+\begin{pmatrix}
+2 &-1 & 0 & 0 &-1 & 0 \\
+-1 & 3 &-1 & 0 &-1 & 0 \\
+0 &-1 & 2 &-1 & 0 & 0 \\
+0 & 0 &-1 & 3 &-1 &-1 \\
+-1 &-1 & 0 &-1 & 3 & 0 \\
+0 & 0 & 0 &-1 & 0 & 1 \\
+\end{pmatrix}
+\]
 \label{prob:laplacian}
 \end{problem}
 
 
-We may also define weighted graphs so that each edge has a weight or cost attached to it.
-In this case the adjacency matrix will have the cost in each entry, rather than just a 1 or 0.
-An example of a weighted may be a collection of cities as vertices, roads connecting them as edges, and the distance of the connecting roads as the cost attached to each edge.
+We may also define \emph{weighted graphs} so that each edge has a weight or cost attached to it.
+In this case, the entries of the adjacency matrix are the costs, rather than just ones or zeros.
+An example of a weighted graph could be a collection of cities as vertices, roads connecting them as edges, and the distances of the connecting roads as the costs attached to each edge.
 
-In this lab we will be investigating the sorts of things that we can discover about a graph by examining the spectrum of its adjacency matrix.
-While the formulation of the adjacency matrix seems to be very simple, its structure allows us to learn surprising things by examining its eigenvalues.
+In this lab we will learn about the information we can discover about a graph from examining the spectrum of its adjacency matrix and its Laplacian.
+While the formulation of the Laplacian matrix seems to be very simple, its structure allows us to learn surprising things by examining its eigenvalues.
 
-For a weighted graph the definition of the Laplacian of a graph is:
+For a weighted graph the definition of the Laplacian is as follows.
 
 \begin{definition}  The \emph{degree} of a vertex of a weighted graph is the sum of the weights of the edges connected to that vertex.
 In undirected graphs, which is what we will be dealing with, this is the sum of all the weights moving into that vertex.
@@ -144,13 +151,12 @@ Q = D-A
 \end{definition}
 
 The Laplacian matrix of a graph will typically be very sparse.
-We will be examining the spectrum of the Laplacian matrix.
 
-A connected graph is a graph where every vertex is connected to every other vertex by at least one path.
+A \emph{connected graph} is a graph where every vertex is connected to every other vertex by at least one path.
 An important question one might ask about a graph is whether or not it is connected.
 What is the best way to do this?
 A naive approach would be to exhaustively map every possible path from each vertex.
-While this would be feasible for very small graphs, most interesting graphs (for example, the internet) will have thousands of vertices and such an approach becomes essentially impossible to execute.
+While this would be feasible for very small graphs, most interesting graphs (for example, the internet) will have thousands of vertices, and such an approach becomes essentially impossible to execute.
 
 It turns out there is a better way.
 If the second smallest eigenvalue of the Laplacian matrix associated with a graph is positive, then this graph is connected.
@@ -158,14 +164,28 @@ The mathematics behind this is quite involved, so we omit a proof for now.
 In many applications the Laplacian matrix will be very sparse, and thus with optimizations made for sparsity, we can discover the connectivity of a graph relatively cheaply.
 
 \begin{problem}Write a function \li{laplacian} that accepts an adjacency matrix as an argument and returns the Laplacian matrix and its second smallest eigenvalue.
-Use the \li{scipy.linalg} package to compute this eigenvalue.
-Using {\tt numpy.rand(n,n)}, generate several random matrices of various sizes.
-Use masking to change the sparsity of said matrices, i.e. {\tt numpy.rand(n,n) > c} for {\tt c = 0.25,0.5,0.75}.
-Try different distributions and $c$ values.
-What can we expect about the connectivity of random matrices?
+Use the \li{scipy.linalg} package to compute the eigenvalue.
+
+Use \li{numpy.random.rand(n,n)} to generate two random matrices of sizes n=10 and n=100.
+Then use masking to change the sparsity of each of the matrices, i.e. \li{numpy.random.rand(n,n) > c} for \li{c = 0.25,0.95}. This will create four different matrices of boolean values. Remember that when doing calculations with boolean values that \li{True} is considered to be a 1 and \li{False} is considered to be a 0. Is the n=10 adjacency matrix connected when we let c=.25? What about when we let c=.95? Is the n=100 adjacency matrix connected when c=.95?
 \end{problem}
 
-A related problem is found in image processing.
+
+\section*{Image Segmentation}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{monuments.png}
+\caption{An image and its segments.}
+\label{fig:monument}
+\end{figure}
+
+An important problem in image processing is that of image segmentation.
+When humans observe an image, they can easily pick out portions of an image that ``belong together.''
+For example, if we saw the picture of a person against a black background, the pixels making up the background would make up one segment of an image, and the person would make up the other part.
+While this seems simple for a human, how can we program a computer to do so? (See Figure \ref{fig:monument} for an example of a segmented image).
+
+First we need to know how to find the adjacency matrix of an image.
 An image is a collection of coordinates and light intensities.
 We call each coordinate and associated brightness a pixel.
 We let every pixel in an image be a vertex in a graph that is connected to its neighbors within a certain radius.
@@ -180,11 +200,30 @@ for $i = 1 \hdots N^2$ and $j = 1 \hdots N^2$ (traveling through each pixel in t
 	\item$d(i,j)$ is the Euclidean distance between pixel $i$ and pixel $j$
 	\item $|I(i) - I(j)|$ is the difference in brightness of pixels $i$ and $j$
 	\item $\sigma_I$ and $\sigma_d$ are constants
+	\item $r$ is the radius
 \end{itemize}
 Thus, given a $N\times N$ image, we will produce an adjacency matrix of size $N^2\times N^2$.
-Even for smaller images, this will become very large, but we have sparsity on our side.
+Even for smaller images, this will become very large, but we have sparsity on our side, especially if $r$ is small.
 Even so, only do this for images smaller than 50 by 50.
-Since each pixel is only connected to the pixels within radius $r$ around it, relatively few entries will be non-zero.
+
+In the following problem we will write a function that finds the adjacency matrix of an image, based on the definition from \eqref{eq:adjacency}. To do this, we first flatten our image being passed in. 
+
+\begin{lstlisting}
+nodes = img.flatten()
+\end{lstlisting}
+
+This allows us to index all of our pixels or nodes using an one-dimensional array. By doing this, we are better able calculate the weights in-between nodes. It is important to note here that this is only one way of indexing the nodes in our image. We can still index our nodes by using the tuple notation of matrix entries. So for example, given a $2 \times 2$ matrix we can access the bottom-right element, if we are using indexing in Python, by the tuple (1,1). If we choose to flatten our matrix we can simple use the index 3.
+
+Since each pixel is only connected to the pixels within radius $r$ around it, relatively few entries will be non-zero. For this reason, we will want to work with sparse matrices from the \li{scipiy.sparse} package. We initialize our adjacency matrix as a sparse matrix as follows:
+
+\begin{lstlisting}
+W = spar.lil_matrix((nodes.size, nodes.size), dtype=float)
+\end{lstlisting}
+
+We use \li{lil_matrix} because it gives us an efficent way to build our matrix piece by piece. To learn more about sparse matrices in scipy read the documenation at \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
+
+Now we go through each node of our image matrix. A helper function has been provided that finds the pixels and corresponding distances within a given radius of a specific pixel. Note that the pixel or node being passed in is indexed in tuple form, as a given row and column number, while it returns an array of pixels with indices in a flat array form (a single number).
+
 
 \begin{problem}
 Write a function \li{adjacency} that takes an $N \times N$ image array, radius $r$, and values for
@@ -195,11 +234,6 @@ Notice that for each pixel you can save time by only checking the pixels $r$ row
 Make use of sparsity in order to feasibly store such a large matrix.
 We have provided code to help out with this problem.
 \end{problem}
-
-An important problem in image processing is that of image segmentation.
-When humans observe an image, they can easily pick out portions of an image that ``belong together.''
-For example, if we saw the picture of a person against a black background, the pixels making up the background would make up one segment of an image, and the person would make up the other part.
-While this seems simple for a human, how can we program a computer to do so?
 
 Once again, we turn to the eigenvalues of the Laplacian matrix.
 We examine the second smallest eigenvalue of $D^{-\frac{1}{2}}QD^{-\frac{1}{2}}$, where $D$ is the degree matrix and $Q$ is the Laplacian matrix of the adjacency matrix defined in \eqref{eq:adjacency}.
