@@ -182,7 +182,7 @@ Then use masking to change the sparsity of each of the matrices, i.e. \li{numpy.
 
 An important problem in image processing is that of image segmentation.
 When humans observe an image, they can easily pick out portions of an image that ``belong together.''
-For example, if we saw the picture of a person against a black background, the pixels making up the background would make up one segment of an image, and the person would make up the other part.
+For example, if we saw a picture of a person against a black background, the pixels making up the background would make up one segment of the image, and the person would make up the other part.
 While this seems simple for a human, how can we program a computer to do so? (See Figure \ref{fig:monument} for an example of a segmented image).
 
 First we need to know how to find the adjacency matrix of an image.
@@ -195,7 +195,7 @@ For an $N \times N$ image, we define an adjacency matrix as follows:
 \label{eq:adjacency}
 w_{ij} = e^{-\frac{|I(i) - I(j)|}{\sigma_I^2}} \cdot \begin{cases} e^{-\frac{d(i,j)}{\sigma_d^2}} & \mbox{ for $d(i,j) < r$} \\ 0 & \mbox{ otherwise} \end{cases}
 \end{equation}
-for $i = 1 \hdots N^2$ and $j = 1 \hdots N^2$ (traveling through each pixel in the image), where
+for $i = 1 \hdots N^2$ and $j = 1 \hdots N^2$ (where both $i$ and $j$ travel through each pixel in the image), and where
 \begin{itemize}
 	\item$d(i,j)$ is the Euclidean distance between pixel $i$ and pixel $j$
 	\item $|I(i) - I(j)|$ is the difference in brightness of pixels $i$ and $j$
@@ -206,33 +206,83 @@ Thus, given a $N\times N$ image, we will produce an adjacency matrix of size $N^
 Even for smaller images, this will become very large, but we have sparsity on our side, especially if $r$ is small.
 Even so, only do this for images smaller than 50 by 50.
 
-In the following problem we will write a function that finds the adjacency matrix of an image, based on the definition from \eqref{eq:adjacency}. To do this, we first flatten our image being passed in. 
+In the following problem we will write a function that finds the adjacency matrix of an image, based on the definition from \eqref{eq:adjacency}. To do this, we first flatten the image we are working on. 
 
 \begin{lstlisting}
 nodes = img.flatten()
 \end{lstlisting}
 
-This allows us to index all of our pixels or nodes using an one-dimensional array. By doing this, we are better able calculate the weights in-between nodes. It is important to note here that this is only one way of indexing the nodes in our image. We can still index our nodes by using the tuple notation of matrix entries. So for example, given a $2 \times 2$ matrix we can access the bottom-right element, if we are using indexing in Python, by the tuple (1,1). If we choose to flatten our matrix we can simple use the index 3.
+This allows us to index all of the pixels (or nodes) using a one-dimensional array. By doing this, we are better able to calculate the weights in-between pixels. It is important to note here that this is only one way of indexing the pixels in our image. We can still index the pixels in our image or matrix by using standard tuple notation. So for example, given a $2 \times 2$ matrix we can access the bottom-right element (if we are including row 0 and column 0) by the tuple (1,1). If we choose to flatten our matrix we can index the same element by the number 3 (if we once again start at 0).
 
-Since each pixel is only connected to the pixels within radius $r$ around it, relatively few entries will be non-zero. For this reason, we will want to work with sparse matrices from the \li{scipiy.sparse} package. We initialize our adjacency matrix as a sparse matrix as follows:
+Since each pixel is only connected to the pixels within radius $r$, relatively few entries will be non-zero. For this reason, we will work with sparse matrices from the \li{scipiy.sparse} package. We first initialize our adjacency matrix as a sparse matrix.
 
 \begin{lstlisting}
 W = spar.lil_matrix((nodes.size, nodes.size), dtype=float)
 \end{lstlisting}
+At this point we can initialize the main diagonal of the degree matrix.
+\begin{lstlisting}
+D = np.zeros((1, nodes.size))
+\end{lstlisting}
 
-We use \li{lil_matrix} because it gives us an efficent way to build our matrix piece by piece. To learn more about sparse matrices in scipy read the documenation at \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
 
-Now we go through each node of our image matrix. A helper function has been provided that finds the pixels and corresponding distances within a given radius of a specific pixel. Note that the pixel or node being passed in is indexed in tuple form, as a given row and column number, while it returns an array of pixels with indices in a flat array form (a single number).
+We use \li{lil_matrix} because it gives us an efficent way to build our matrix piece by piece. To learn more about sparse matrices in scipy read the documentation at \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
+
+Now we go through each pixel of our image matrix to calculate the weights.
+
+\begin{lstlisting}
+# 'height' is the original height of the image
+# 'width' is the original width of the image
+for row in xrange(height):
+    for col in xrange(width):
+        # Calculate the index of the pixel at (row, col) relative to the
+        # flattened array 'nodes'. 
+        rowcol = row * width + col
+\end{lstlisting}
+
+Say we start with pixel \li{A}. Notice that we do not need to find the weights between every pixel and pixel \li{A}, since most of the weights will be 0. We only need to find the weights between pixel \li{A} and those pixels that are within radius $r$ of pixel \li{A}. 
+
+A helper function has been provided that finds the pixels and corresponding distances within radius $r$ of a single pixel. Note that the pixel being passed into the function is indexed as a tuple, or more precisely as a given row and column number. The function returns however, an array of pixels with indices in flat-array form (single numbers). This array contains the pixels that are within radius $r$ of the pixel passed into the function.
+\lstinputlisting[style=fromfile]{getNeighbors.py}
+Below we use the helper function to get the indices and distances.
+
+\begin{lstlisting}
+# find the indices and distancess of the pixels that are within 
+# distance r of the current pixel by calling getNeighbors
+indices, distances = getNeighbors(row, col, radius, height, width)
+\end{lstlisting}
+We can then calcluate the weights between pixels. Once we find the weights we can then add them into our adjacency matrix. 
+\begin{lstlisting}
+# 'weights' is the weights between the pixel we are on and the pixels within
+# radius r
+W[rowcol, indices] = weights
+\end{lstlisting}
+We can also calculate the main diagonal of the degree matrix.
+\begin{lstlisting}
+D[0,rowcol] = weights.sum()
+\end{lstlisting}
+
+After we have found our adjacency matrix (\li{W} in the code we have provided above) we convert it to a \li{csc} format. 
+\begin{lstlisting}
+W = W.tocsc()
+\end{lstlisting}
+The sparse matrix format \li{csc} is better for computations which we will want to use later.
+
+
 
 
 \begin{problem}
 Write a function \li{adjacency} that takes an $N \times N$ image array, radius $r$, and values for
-$\sigma_I^2$ and $\sigma_d^2$, and returns the adjacency matrix defined in \eqref{eq:adjacency}.
-Notice that for each pixel you can save time by only checking the pixels $r$ rows and columns away.
+$\sigma_I^2$ and $\sigma_d^2$, and returns the adjacency matrix defined in \eqref{eq:adjacency}. Test your function on the image \li{dream.png}. It is read in as a color photo so first convert it to grayscale to get rid of one of the dimensions.
+\begin{lstlisting}
+img_color = plt.imread('dream.png')
+img = (img_color[:,:,0]+img_color[:,:,1]+img_color[:,:,2])/3.0
+\end{lstlisting}
+Let $r=5.0$, $\sigma_I^2=.02$ and $\sigma_d^2=3.0$.
+
+
+%Notice that for each pixel you can save time by only checking the pixels $r$ rows and columns away.
 %For that you'll have to handle the pixels on the edges and corners of the image carefully.
 %I gave them new helper code, which abstracts away the edge cases.
-Make use of sparsity in order to feasibly store such a large matrix.
-We have provided code to help out with this problem.
 \end{problem}
 
 Once again, we turn to the eigenvalues of the Laplacian matrix.
