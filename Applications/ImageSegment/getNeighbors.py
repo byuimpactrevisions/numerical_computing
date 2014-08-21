@@ -1,3 +1,4 @@
+# helper function
 def getNeighbors(row, col, radius, height, width):
     '''
     Calculate the indices and corresponding distances of pixels within radius
