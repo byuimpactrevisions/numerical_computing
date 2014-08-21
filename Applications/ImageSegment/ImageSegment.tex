@@ -5,10 +5,29 @@
 
 \section*{Graph Theory}
 \begin{figure}[h]
-\includegraphics[width=\textwidth/2]{graphExample}
+\includegraphics[width=\textwidth/3]{graphExample}
 \caption{A simple undirected graph}
 \label{fig:example_graph}
 \end{figure}
+
+\begin{figure}[h]
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.5cm,
+ thick,main node/.style={circle,draw}]
+
+  \node[main node] (A) [] {A};
+  \node[main node] (B) [below of=A] {B};
+  \node[main node] (C) [right of=A] {C};
+  \node[main node] (D) [below of=C] {D};
+  \node[main node] (E) [right of=C] {E};
+  \node[main node] (F) [right of=D] {F};
+
+  \foreach \s/\t in {A/C, B/A, B/D, C/E, C/F, D/C} {
+   \path[draw] (\s) edge (\t);}
+\end{tikzpicture}
+\caption{A simple directed graph}
+\end{figure}
+
+
 
 Graphs are often used to represent relationships between objects.
 They are represented by a set of nodes (or vertices) and a set of edges, where each edge connects exactly two nodes.
@@ -181,11 +200,11 @@ Then use masking to change the sparsity of each of the matrices, i.e. \li{numpy.
 \end{figure}
 
 An important problem in image processing is that of image segmentation.
-When humans observe an image, they can easily pick out portions of an image that ``belong together.''
+When humans observe an image, they can easily pick out portions of that image that ``belong together''.
 For example, if we saw a picture of a person against a black background, the pixels making up the background would make up one segment of the image, and the person would make up the other part.
 While this seems simple for a human, how can we program a computer to do so? (See Figure \ref{fig:monument} for an example of a segmented image).
 
-First we need to know how to find the adjacency matrix of an image.
+One way to do this was presented in a paper by Jianbo Shi and Jitendra Malik in 2000. To use the algorithm they presented, we first need to find the adjacency matrix of an image.
 An image is a collection of coordinates and light intensities.
 We call each coordinate and associated brightness a pixel.
 We let every pixel in an image be a vertex in a graph that is connected to its neighbors within a certain radius.
@@ -203,8 +222,11 @@ for $i = 1 \hdots N^2$ and $j = 1 \hdots N^2$ (where both $i$ and $j$ travel thr
 	\item $r$ is the radius
 \end{itemize}
 Thus, given a $N\times N$ image, we will produce an adjacency matrix of size $N^2\times N^2$.
-Even for smaller images, this will become very large, but we have sparsity on our side, especially if $r$ is small.
-Even so, only do this for images smaller than 50 by 50.
+Even for smaller images, this will become very large, but we have sparsity on our side, especially if $r$ is small. Even so, only do this for images smaller than 50 by 50.
+
+In definition \eqref{eq:adjacency}, we can think of $w_{ij}$ as the weight representing the similarity between pixels. So if a weight between two pixels is low, we can think of those pixels as being less similar and therefore more likely to represent where the image is segmented. We therefore want to segment our image along the edges with low weights. The total weight of the edges we remove is called the `cut' and so part of the mathematics behind image segmentation is minimizing the `cut', or in other words finding the segments that are least similar to each other.
+
+
 
 In the following problem we will write a function that finds the adjacency matrix of an image, based on the definition from \eqref{eq:adjacency}. To do this, we first flatten the image we are working on. 
 
@@ -212,21 +234,19 @@ In the following problem we will write a function that finds the adjacency matri
 nodes = img.flatten()
 \end{lstlisting}
 
-This allows us to index all of the pixels (or nodes) using a one-dimensional array. By doing this, we are better able to calculate the weights in-between pixels. It is important to note here that this is only one way of indexing the pixels in our image. We can still index the pixels in our image or matrix by using standard tuple notation. So for example, given a $2 \times 2$ matrix we can access the bottom-right element (if we are including row 0 and column 0) by the tuple (1,1). If we choose to flatten our matrix we can index the same element by the number 3 (if we once again start at 0).
+This allows us to index all of the pixels (or nodes) using a one-dimensional array. By doing this, we are better able to calculate the weights in-between pixels. It is important to note here that this is only one way of indexing the pixels in our image. We can still index the pixels in our image or matrix by using standard tuple notation. So for example, given a $2 \times 2$ matrix we can access the bottom-right element (if we are starting at row 0 and column 0) by the tuple (1,1). If we choose to flatten our matrix we can index the same element by the number 3 (if we once again start at 0).
 
-Since each pixel is only connected to the pixels within radius $r$, relatively few entries will be non-zero. For this reason, we will work with sparse matrices from the \li{scipiy.sparse} package. We first initialize our adjacency matrix as a sparse matrix.
+Since each pixel is only connected to the pixels within radius $r$, relatively few entries of our adjacency matrix will be non-zero. For this reason, we will work with sparse matrices from the \li{scipiy.sparse} package. We first initialize our adjacency matrix as a sparse matrix.
 
 \begin{lstlisting}
 W = spar.lil_matrix((nodes.size, nodes.size), dtype=float)
 \end{lstlisting}
-At this point we can initialize the main diagonal of the degree matrix.
+We use \li{lil_matrix} because it gives us an efficent way to build our matrix piece by piece. To learn more about sparse matrices in scipy read the documentation at \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
+
+At this point we can initialize the main diagonal of the degree matrix. We only care about the main diagonal because the degree matrix is a diagonal matrix.
 \begin{lstlisting}
 D = np.zeros((1, nodes.size))
 \end{lstlisting}
-
-
-We use \li{lil_matrix} because it gives us an efficent way to build our matrix piece by piece. To learn more about sparse matrices in scipy read the documentation at \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
-
 Now we go through each pixel of our image matrix to calculate the weights.
 
 \begin{lstlisting}
@@ -238,32 +258,34 @@ for row in xrange(height):
         # flattened array 'nodes'. 
         rowcol = row * width + col
 \end{lstlisting}
-
 Say we start with pixel \li{A}. Notice that we do not need to find the weights between every pixel and pixel \li{A}, since most of the weights will be 0. We only need to find the weights between pixel \li{A} and those pixels that are within radius $r$ of pixel \li{A}. 
 
-A helper function has been provided that finds the pixels and corresponding distances within radius $r$ of a single pixel. Note that the pixel being passed into the function is indexed as a tuple, or more precisely as a given row and column number. The function returns however, an array of pixels with indices in flat-array form (single numbers). This array contains the pixels that are within radius $r$ of the pixel passed into the function.
+A helper function has been provided that finds the pixels and corresponding distances within radius $r$ of a single pixel. Note that the pixel being passed into the function is indexed as a tuple, or more precisely as a given row and column index. The function returns however, an array of indices in the flat array form (single numbers) of pixels within radius $r$ of the pixel passed into the function.
 \lstinputlisting[style=fromfile]{getNeighbors.py}
 Below we use the helper function to get the indices and distances.
 
 \begin{lstlisting}
-# find the indices and distancess of the pixels that are within 
+# find the indices and distances of the pixels that are within 
 # distance r of the current pixel by calling getNeighbors
 indices, distances = getNeighbors(row, col, radius, height, width)
 \end{lstlisting}
-We can then calcluate the weights between pixels. Once we find the weights we can then add them into our adjacency matrix. 
+We can then calcluate the weights between pixels by using definition \eqref{eq:adjacency}. The helper function already calculates the distances, so now we just need to find the difference in brightness of pixels by subtracting the corresponding pixels.
+Once we find the weights we can then add them into our adjacency matrix. 
 \begin{lstlisting}
 # 'weights' is the weights between the pixel we are on and the pixels within
 # radius r
 W[rowcol, indices] = weights
 \end{lstlisting}
-We can also calculate the main diagonal of the degree matrix.
+We can also calculate part of the main diagonal of the degree matrix.
 \begin{lstlisting}
 D[0,rowcol] = weights.sum()
 \end{lstlisting}
+We now loop to the next pixel and repeat the process.
 
-After we have found our adjacency matrix (\li{W} in the code we have provided above) we convert it to a \li{csc} format. 
+After we have found our adjacency matrix (\li{W} in the code we have provided above) we convert it to a \li{csc} format, and return both \li{W} and \li{D}. 
 \begin{lstlisting}
 W = W.tocsc()
+return W, D
 \end{lstlisting}
 The sparse matrix format \li{csc} is better for computations which we will want to use later.
 
@@ -272,24 +294,48 @@ The sparse matrix format \li{csc} is better for computations which we will want 
 
 \begin{problem}
 Write a function \li{adjacency} that takes an $N \times N$ image array, radius $r$, and values for
-$\sigma_I^2$ and $\sigma_d^2$, and returns the adjacency matrix defined in \eqref{eq:adjacency}. Test your function on the image \li{dream.png}. It is read in as a color photo so first convert it to grayscale to get rid of one of the dimensions.
+$\sigma_I^2$ and $\sigma_d^2$, and returns the adjacency matrix defined in \eqref{eq:adjacency}. Test your function on the image \li{dream.png}. This image is read in as a color photo so first convert it to grayscale to reduce it to two dimensions.
 \begin{lstlisting}
+# read in the image
 img_color = plt.imread('dream.png')
+# convert to grayscale
 img = (img_color[:,:,0]+img_color[:,:,1]+img_color[:,:,2])/3.0
 \end{lstlisting}
-Let $r=5.0$, $\sigma_I^2=.02$ and $\sigma_d^2=3.0$.
+Let $r=5.0$, $\sigma_I^2=0.02$ and $\sigma_d^2=3.0$.
 
 
 %Notice that for each pixel you can save time by only checking the pixels $r$ rows and columns away.
 %For that you'll have to handle the pixels on the edges and corners of the image carefully.
 %I gave them new helper code, which abstracts away the edge cases.
+\label{prob4}
 \end{problem}
 
-Once again, we turn to the eigenvalues of the Laplacian matrix.
-We examine the second smallest eigenvalue of $D^{-\frac{1}{2}}QD^{-\frac{1}{2}}$, where $D$ is the degree matrix and $Q$ is the Laplacian matrix of the adjacency matrix defined in \eqref{eq:adjacency}.
-The associated $N^2 \times 1$ eigenvector will have positive and negative entries, splitting the image into two parts.
-Thanks to some very fancy mathematics and the way we have defined the weights between nodes, this does a pretty good job of breaking an image into two segments.
-Recursively executing this function, we can find segments within segments.
+As was mentioned before, we are trying to minimize the `cut', or the total weight of the edges we remove to create segments. This problem comes down to finding the second smallest eigenvalue of $D^{-1/2}QD^{-1/2}$, where $D$ is the degree matrix and $Q$ is the Laplacian matrix of the adjacency matrix defined in \eqref{eq:adjacency}. The mathematics behind this is quite involved, so the reader is encouraged to read the paper that Shi and Malik wrote at \url{http://www.cs.berkeley.edu/~malik/papers/SM-ncut.pdf} for a better understanding.
+	
+To calculate $D^{-1/2}QD^{-1/2}$, we once again use sparse matrices. We use the \li{adjacency} function from Problem \ref{prob4} to find the adjacency matrix \li{W} and the main diagonal of the degree matrix \li{D}. We can convert \li{D} into a diagonal sparse matrix using \li{spar.spdiags}.
+
+\begin{lstlisting}
+Ds = spar.spdiags(D, 0, D.shape[1], D.shape[1], format = 'csc')
+\end{lstlisting}
+
+In like manner we can find the diagonal sparse matrix $D^{-1/2}$. We can also calculate the Laplacian matrix $Q$ since \li{Ds} and \li{W} are both sparse matrices and in `csc' format. To matrix multiply two sparse matrices together, use the \li{dot} function. For example, if \li{M} and \li{N} are two sparse matrices, use \li{M.dot(N)}.
+
+The eigenvector associated with the second smallest eigenvalue will be a $N^2 \times 1$ vector and will have positive and negative entries. If we reshape this vector to be the same size as our original image we can create a mask that will create two segments - one segment corresponding to the positive values of the eigenvector and the other segment corresponding to the negative values of the eigenvector. 
+
+\begin{lstlisting}
+# create a mask array that is True wherever the eigenvector is positive.
+# reshape it to be the size of img.
+mask = (eigvec>0).reshape(img.shape)
+\end{lstlisting}
+To find the segments, we only need to take the product of our mask with the original image.
+
+\begin{lstlisting}
+# create the positive segment by masking out the pixels in img 
+# belonging to the negative segment.
+pos = img*mask
+\end{lstlisting}
+By recursively executing this function, we can find segments within segments.
+
 %Figure \ref{segmentation:example} shows a simple example of an image and its segments.
 
 %\begin{figure}
@@ -302,7 +348,9 @@ Recursively executing this function, we can find segments within segments.
 
 \begin{problem}  Write a function \li{segment} that solves the segmentation problem for small images.
 Accept an image array as an argument and return the two segments.
-Use $r = 5, \sigma_I^2 = 0.02,$ and $\sigma_d^2 = 3.0$.
-Remember that the Laplacian matrix will be very large but also very sparse.
-Because of the way we defined $\sigma_I^2$ the image matrix intensity values need to be between $0.0$ and $1.0$.
+Use $r = 5.0, \sigma_I^2 = 0.02,$ and $\sigma_d^2 = 3.0$.
+Remember that the Laplacian matrix will be very large, but also very sparse.
+Because of the way we defined $\sigma_I^2$ the image matrix intensity values need to be between $0.0$ and $1.0$. If this is not standard for the images you are using, change $\sigma_I^2$.
+
+Test your function on the image \li{dream.png}. Your segments should look like the segments below.
 \end{problem}
