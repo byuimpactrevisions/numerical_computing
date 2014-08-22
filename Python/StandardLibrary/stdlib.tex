@@ -236,7 +236,7 @@ python hunger.py output.txt
 \end{lstlisting}
 
 \li{hunger.py} is the name of the script you are writing and \li{output.txt} is the name of the file (not yet created) where we will write the output of the tournament. In this problem, print the name of the file passed in (output.txt) to make sure the script recognizes the argument. Don't forget to import the \li{sys} module.
-
+\label{prob:prob2}
 \end{problem}
 
 
@@ -358,6 +358,7 @@ The \li{random} module has functions that can sample from a variety of different
 
 \begin{problem}
 Each contestant of the Hunger Games must survive each day if they are to win. Write a function that creates a list of 24 random floating point numbers between 1.0 and 10.0. The numbers in this list will be used later as the likelihood of the tributes surviving an event.
+\label{prob:prob5}
 \end{problem}
 
 \section*{\texttt{itertools} Module}
@@ -561,6 +562,7 @@ for d, t in enumerate(itertools.izip(males, females),1):
 \end{lstlisting}
 
 where ``Tribute" is the named tuple, ``d" is the current district number provided by enumerate (starting at 1), and t is the \li{izip()} generator containing the male, female pair. Return the tributes list. The list should contain 24 named tuples, each one representing a tribute.
+\label{prob:prob6}
 \end{problem}
 
 
@@ -627,12 +629,12 @@ Compare the timings you obtain from a deque and a list of 10000 elements, using 
 \begin{problem}
 Throughout this lab we have worked on simulating the Hunger Games tournament using the standard library and other built-in functions found in Python.
 
-To piece everything together, write a function that takes in as parameters the list of events, the random list created in Problem 5, and the list of tributes created in Problem 6.
+To piece everything together, write a function that takes in as parameters the list of events, the random list created in Problem \ref{prob:prob5}, and the list of tributes created in Problem \ref{prob:prob6}.
 
 To simulate the game, you will need to do at least the following.
 For each day of the simulation, each (surviving) tribute will experience one event per day. Each event should be randomly chosen from the list of events you read from the text file.
 To determine the survival of a given tribute, randomly generate a real number between 1.0 and 10.0. 
-If the random number is greater than the likelihood of surviving the event, then the tribute survives the event for that day. Note that the likelihood of surviving the event comes from the list of random numbers generated in Problem 5. So the nth tribute/survivor will survive if their random number is greater than the nth element of the list of likelihoods from Problem 5.
+If the random number is greater than the likelihood of surviving the event, then the tribute survives the event for that day. Note that the likelihood of surviving the event comes from the list of random numbers generated in Problem \ref{prob:prob5}. So the nth tribute/survivor will survive if their random number is greater than the nth element of the list of likelihoods from Problem \ref{prob:prob5}.
 
 After each day, write the results of the competition to a file using the file object from the first part of this lab:
 
@@ -640,7 +642,7 @@ After each day, write the results of the competition to a file using the file ob
 with open('output.txt', 'w') as f:
 \end{lstlisting}
 
-The file \li{output.txt} is the name of the file you should have passed in from Problem 2 using the \li{sys} module. Write to the file the names of the survivors along with what events they survived, as well as the names of those who didn't survive and their associated events.
+The file \li{output.txt} is the name of the file you should have passed in from Problem \ref{prob:prob2} using the \li{sys} module. Write to the file the names of the survivors along with what events they survived, as well as the names of those who didn't survive and their associated events.
 
 Make sure that you initialize your file object outside any loops, so that you don't completely overwrite your file each time you loop.
 
