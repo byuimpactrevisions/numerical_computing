@@ -25,6 +25,5 @@ script:
   - /opt/texbin/pdflatex Vol2.tex
   - /opt/texbin/pdflatex Vol3.tex
   - /opt/texbin/pdflatex Vol4.tex
-
-after_success:
+  - /opt/texbin/pdflatex ExtraLabs.tex
   - python travis_post.py
