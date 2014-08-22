@@ -336,15 +336,6 @@ pos = img*mask
 \end{lstlisting}
 By recursively executing this function, we can find segments within segments.
 
-%Figure \ref{segmentation:example} shows a simple example of an image and its segments.
-
-%\begin{figure}
-%\includegraphics[scale=0.2]{monument}
-%\includegraphics[scale=0.2]{segment1}
-%\includegraphics[scale=0.2]{segment2}
-%\caption{An image and it's segments.}
-%\label{segmentation:example}
-%\end{figure}
 
 \begin{problem}  Write a function \li{segment} that solves the segmentation problem for small images.
 Accept an image array as an argument and return the two segments.
@@ -352,5 +343,12 @@ Use $r = 5.0, \sigma_I^2 = 0.02,$ and $\sigma_d^2 = 3.0$.
 Remember that the Laplacian matrix will be very large, but also very sparse.
 Because of the way we defined $\sigma_I^2$ the image matrix intensity values need to be between $0.0$ and $1.0$. If this is not standard for the images you are using, change $\sigma_I^2$.
 
-Test your function on the image \li{dream.png}. Your segments should look like the segments below.
+Test your function on the image \li{dream.png}. Your segments should look like the segments in Figure \ref{fig:dream_solution} with the original image on the left.
 \end{problem}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{dream_solution.png}
+\caption{Segments of \li{dream.png}}
+\label{fig:dream_solution}
+\end{figure}
